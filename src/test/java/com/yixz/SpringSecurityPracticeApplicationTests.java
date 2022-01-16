@@ -1,4 +1,4 @@
-package org.yixz;
+package com.yixz;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
