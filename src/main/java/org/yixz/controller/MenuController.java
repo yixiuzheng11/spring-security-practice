@@ -35,7 +35,7 @@ public class MenuController {
         return menuService.getTreeMenu();
     }
 
-    @ApiOperation("菜单查询")
+    @ApiOperation("菜单分页查询")
     @PreAuthorize("hasAuthority('/system/menu/select')")
     @PostMapping("/getPage")
     public Page<Menu> getPage(@RequestBody MenuDto dto) {

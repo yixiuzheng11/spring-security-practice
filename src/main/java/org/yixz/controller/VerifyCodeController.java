@@ -23,7 +23,7 @@ public class VerifyCodeController {
     @Autowired
     private Producer producer;
 
-    @GetMapping("/vc.jpg")
+    @GetMapping("/verCode")
     public void getVerifyCode(HttpServletResponse resp, HttpSession session) throws IOException {
         resp.setContentType("image/jpeg");
         String text = producer.createText();

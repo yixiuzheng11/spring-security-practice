@@ -6,6 +6,7 @@ import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
@@ -28,7 +29,7 @@ public class Knife4jConfiguration {
                 .apiInfo(apiInfo())
                 .select()
                 // 为当前包路径
-                .apis(RequestHandlerSelectors.basePackage("com.yixz.controller")).paths(PathSelectors.any())
+                .apis(RequestHandlerSelectors.basePackage("org.yixz.controller")).paths(PathSelectors.any())
                 .paths(PathSelectors.any())
                 .build();
     }
@@ -41,8 +42,8 @@ public class Knife4jConfiguration {
                 // 描述
                 .description("swagger-bootstrap-ui")
                 // 创建人信息
-                //.contact(new Contact("YIXIUZHENG741",  "https://www.cnblogs.com/zs-notes/category/1258467.html",  "YIXIUZHENG741@pingan.com.cn"))
-                //.termsOfServiceUrl("http://localhost:9090/")
+                .contact(new Contact("yixiuzheng",  "https://www.cnblogs.com/zs-notes/category/1258467.html",  "yixiuzheng11@163.com"))
+                .termsOfServiceUrl("http://localhost:9090/")
                 // 版本号
                 .version("1.0")
                 .build();
