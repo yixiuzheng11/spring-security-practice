@@ -64,7 +64,7 @@ public class MybatisPlusGenerator {
 
         // 包配置
         PackageConfig pc = new PackageConfig();
-        pc.setParent("com.yixz");
+        pc.setParent("org.yixz");
         //pc.setModuleName("example.mybatisP");
         pc.setController("controller");
         pc.setEntity("entity");
@@ -131,7 +131,7 @@ public class MybatisPlusGenerator {
         //是否生成@RestController注解的controller
         strategy.setRestControllerStyle(true);
         // 自定义实体父类
-        //strategy.setSuperEntityClass("com.yixz.entity.BaseEntity");
+        //strategy.setSuperEntityClass("org.yixz.entity.BaseEntity");
         // 自定义实体，公共字段
         //strategy.setSuperEntityColumns(new String[] { "baseId"});
         // 自定义 mapper父类，默认是com.baomidou.mybatisplus.core.mapper.BaseMapper

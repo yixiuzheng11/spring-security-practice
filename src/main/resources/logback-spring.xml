@@ -34,7 +34,7 @@
             </encoder>
         </appender>
         <!-- -->
-        <logger name="com.yixz.mapper" level="debug" additivity="false">
+        <logger name="org.yixz.mapper" level="debug" additivity="false">
             <appender-ref ref="COLOR_CONSOLE" />
         </logger>
     </springProfile>

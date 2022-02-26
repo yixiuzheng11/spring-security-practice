@@ -73,7 +73,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      * 自定义登录过滤器，支持form和json传参
      * @author YIXIUZHENG741
      * @date 2021/11/26 10:19
-     * @return com.yixz.sys.filter.LoginFilter
+     * @return org.yixz.sys.filter.LoginFilter
      */
     @Bean
     public LoginFilter loginFilter() throws Exception {
@@ -88,7 +88,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      * 自定义JWT过滤器
      * @author YIXIUZHENG741
      * @date 2021/11/26 10:19
-     * @return com.yixz.sys.filter.LoginFilter
+     * @return org.yixz.sys.filter.LoginFilter
      */
     @Bean
     public JwtAthenticationFilter jwtAthenticationFilter() throws Exception {
@@ -100,7 +100,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      * 登录校验
      * @author YIXIUZHENG741
      * @date 2021/11/26 10:19
-     * @return com.yixz.sys.filter.LoginFilter
+     * @return org.yixz.sys.filter.LoginFilter
      */
     @Bean
     public CustomDaoAuthenticationProvider daoAuthenticationProvider(){

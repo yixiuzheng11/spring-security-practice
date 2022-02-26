@@ -19,7 +19,7 @@ import java.util.Map;
  * @author YIXIUZHENG741
  * @date 2021年07月22日 16:38
  */
-@RestControllerAdvice("com.yixz.controller")
+@RestControllerAdvice("org.yixz.controller")
 public class GlobalResponseBodyAdvice implements ResponseBodyAdvice<Object> {
 
     /**
