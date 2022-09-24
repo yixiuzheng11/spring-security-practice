@@ -16,5 +16,5 @@ import java.util.List;
  * @since 2021-12-22
  */
 public interface MenuMapper extends BaseMapper<Menu> {
-    List<MenuVo> getMyMenu(@Param("userId") Integer userId);
+    List<MenuVo> getPermMenu(@Param("userId") Integer userId);
 }

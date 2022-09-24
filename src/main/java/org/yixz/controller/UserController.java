@@ -8,6 +8,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.yixz.vo.UserVo;
+
 import javax.annotation.Resource;
 
 /**
@@ -18,10 +20,16 @@ import javax.annotation.Resource;
  */
 @Api(tags = "用户管理")
 @RestController
-@RequestMapping("/system/user")
+@RequestMapping("/sys/user")
 public class UserController {
     @Resource
     private UserServiceImpl userService;
+
+    @ApiOperation("用户查询")
+    @GetMapping("/getCurrentUser")
+    public UserVo getCurrentUser() {
+        return userService.getCurrentUser();
+    }
 
     @ApiOperation("用户查询")
     @PreAuthorize("hasAuthority('/system/user/select')")

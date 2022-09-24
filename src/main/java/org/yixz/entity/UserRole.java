@@ -41,11 +41,6 @@ public class UserRole extends Model<UserRole> {
     private Integer roleId;
 
     /**
-     * 逻辑状态
-     */
-    private Integer voidFlag;
-
-    /**
      * 创建时间
      */
     @TableField(fill = FieldFill.INSERT)

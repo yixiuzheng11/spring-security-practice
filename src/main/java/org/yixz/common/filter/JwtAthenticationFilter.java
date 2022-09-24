@@ -51,7 +51,7 @@ public class JwtAthenticationFilter extends BasicAuthenticationFilter {
         if (StringUtils.isBlank(userName)) {
             throw new AccessDeniedException("无权限");
         }
-        CustomUserDetails userDetails = userService.getUserPermsFromRedis(userName);
+        CustomUserDetails userDetails = userService.getUserPermByUserName(userName);
         if(userDetails==null) {
             throw new AccessDeniedException("无权限");
         }

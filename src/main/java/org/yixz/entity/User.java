@@ -45,11 +45,6 @@ public class User {
     private String password;
 
     /**
-     * 逻辑状态
-     */
-    private Integer voidFlag;
-
-    /**
      * 创建时间
      */
     @TableField(fill = FieldFill.INSERT)

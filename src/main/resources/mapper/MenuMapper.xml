@@ -5,10 +5,12 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="org.yixz.entity.Menu">
         <id column="id" property="id" />
-        <result column="pid" property="pid" />
-        <result column="name" property="name" />
+        <result column="parent_id" property="parentId" />
+        <result column="menu_name" property="menuName" />
+        <result column="menu_code" property="menuCode" />
         <result column="url" property="url" />
-        <result column="perm" property="perm" />
+        <result column="icon" property="icon" />
+        <result column="perms" property="perm" />
         <result column="type" property="type" />
         <result column="sort" property="sort" />
         <result column="created_date" property="createdDate" />
@@ -19,27 +21,18 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, pid, name, url, perm, type, sort, created_date, updated_date, created_by, updated_by
+        id, parentId, menuName, menuCode, url, icon, perms, type, sort, created_date, updated_date, created_by, updated_by
     </sql>
 
-    <!-- 通用查询映射结果 -->
-    <resultMap id="MenuVoMap" type="org.yixz.vo.MenuVo">
-        <id column="id" property="id" />
-        <result column="pid" property="pid" />
-        <result column="name" property="name" />
-        <result column="url" property="url" />
-        <result column="perm" property="perm" />
-        <result column="type" property="type" />
-        <result column="sort" property="sort" />
-    </resultMap>
-
-    <select id="getMyMenu" resultMap="MenuVoMap">
+    <select id="getPermMenu" resultType="org.yixz.vo.MenuVo">
         SELECT
         menu.id,
-        menu.name,
-        menu.pid,
+        menu.menu_name,
+        menu.menu_code,
+        menu.parent_id,
         menu.url,
-        menu.perm,
+        menu.icon,
+        menu.perms,
         menu.type,
         menu.sort
         FROM

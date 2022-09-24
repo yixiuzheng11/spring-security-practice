@@ -30,9 +30,9 @@ import java.util.stream.Collectors;
 @Service
 public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> {
     public List<MenuVo> getTreeMenu() {
-        List<MenuVo> voList = this.getMyMenu();
+        List<MenuVo> voList = this.getPermMenu();
         //筛选出根节点
-        List<MenuVo> list = voList.stream().filter(m -> m.getPid() == 0).map(
+        List<MenuVo> list = voList.stream().filter(m -> m.getParentId() == 0).map(
                 (m) -> {
                     m.setChildren(getChildren(m, voList));
                     return m;
@@ -44,7 +44,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> {
     public List<MenuVo> getChildren(MenuVo root, List<MenuVo> menuList) {
         List<MenuVo> list = menuList.stream().filter(menu ->
                 //筛选出下一节点元素
-                !MenuTypeEnum.BTN_TYPE.getCode().equals(menu.getType()) && menu.getPid().intValue() == root.getId().intValue()
+                !MenuTypeEnum.BTN_TYPE.getCode().equals(menu.getType()) && menu.getParentId().intValue() == root.getId().intValue()
         ).map(menu -> {
             //递归set子节点
             if(MenuTypeEnum.DIR_TYPE.getCode().equals(menu.getType())) {
@@ -60,26 +60,26 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> {
     public List<MenuVo> getPermList(MenuVo root, List<MenuVo> menuList) {
         List<MenuVo> list = menuList.stream().filter(menu ->
                 //筛选出下一节点元素
-                MenuTypeEnum.BTN_TYPE.getCode().equals(menu.getType()) && menu.getPid().intValue() == root.getId().intValue())
+                MenuTypeEnum.BTN_TYPE.getCode().equals(menu.getType()) && menu.getParentId().intValue() == root.getId().intValue())
                 .collect(Collectors.toList());
         return list;
     }
 
-    public List<MenuVo> getMyMenu() {
+    public List<MenuVo> getPermMenu() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         //只查询目录和菜单
-        List<MenuVo> list = baseMapper.getMyMenu(userDetails.getId());
+        List<MenuVo> list = baseMapper.getPermMenu(userDetails.getId());
         return list;
     }
 
     public Page<Menu> getPage(MenuDto dto) {
         Page page = new Page(dto.getPageNum(), dto.getPageSize());
         QueryWrapper<Menu> queryWrapper = new QueryWrapper();
-        queryWrapper.eq(dto.getPid()!=null, "pid", dto.getPid());
+        queryWrapper.eq(dto.getParentId()!=null, "pid", dto.getParentId());
         queryWrapper.eq(StringUtils.isNotEmpty(dto.getUrl()), "url", dto.getUrl());
         queryWrapper.eq(StringUtils.isNotEmpty(dto.getType()), "type", dto.getType());
-        queryWrapper.like(StringUtils.isNotEmpty(dto.getName()), "name", dto.getName());
+        queryWrapper.like(StringUtils.isNotEmpty(dto.getMenuName()), "name", dto.getMenuName());
         return baseMapper.selectPage(page, queryWrapper);
     }
 
@@ -92,8 +92,8 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> {
 
     public void update(MenuDto dto) {
         LambdaUpdateWrapper<Menu> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.set(Menu::getPid, dto.getPid());
-        updateWrapper.set(Menu::getName, dto.getName());
+        updateWrapper.set(Menu::getParentId, dto.getParentId());
+        updateWrapper.set(Menu::getMenuName, dto.getMenuName());
         updateWrapper.set(Menu::getUrl, dto.getUrl());
         updateWrapper.eq(Menu::getId, dto.getId());
         //这里传个new出来的user对象，确保FieldFill.INSERT_UPDATE属性在更新时自动填充值

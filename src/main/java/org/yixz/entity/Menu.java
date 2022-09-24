@@ -25,12 +25,17 @@ public class Menu{
     /**
      * 父id
      */
-    private Integer pid;
+    private Integer parentId;
 
     /**
      * 菜单名称
      */
-    private String name;
+    private String menuName;
+
+    /**
+     * 菜单名称
+     */
+    private String menuCode;
 
     /**
      * 菜单路径
@@ -40,10 +45,15 @@ public class Menu{
     /**
      * 授权
      */
-    private String perm;
+    private String perms;
 
     /**
-     * 菜单类型，1-目录，2-菜单，3-按钮
+     * 菜单图标
+     */
+    private String icon;
+
+    /**
+     * 菜单类型，0-目录，1-菜单，2-按钮
      */
     private Integer type;
 

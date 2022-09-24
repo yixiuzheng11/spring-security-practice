@@ -3,7 +3,10 @@ package org.yixz.service;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.yixz.common.util.SysConstants;
 import org.yixz.dto.UserDto;
 import org.yixz.enums.MenuTypeEnum;
@@ -21,6 +24,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.yixz.vo.UserVo;
+
 import javax.annotation.Resource;
 import java.util.HashSet;
 import java.util.List;
@@ -39,8 +44,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Resource
     private RedisOptService redisOptService;
 
+    public User getUserByUserName(String userName) {
+        List<User> list = baseMapper.selectList(Wrappers.<User>lambdaQuery().eq(User::getUserName, userName));
+        if(CollectionUtils.isEmpty(list)) {
+            return null;
+        }
+        return list.get(0);
+    }
+
+
     /**
-     * 查询用户信息
+     * 登录时，spring security根据这个方法查询用户信息，用来校验密码
      * @author YIXIUZHENG741
      * @date 2022/1/10 14:31
      * @param userName
@@ -48,17 +62,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        //这里要把密码查询出来，后面用于校验密码
-        CustomUserDetails userDetails = getUserPermByUserName(userName);
-        if(userDetails==null) {
+        User user = this.getUserByUserName(userName);
+        if(user==null) {
             throw new UsernameNotFoundException("用户不存在");
         }
-        setUserPermsToRedis(userDetails);
+        //这里要把密码查询出来，后面用于校验密码
+        CustomUserDetails userDetails = new CustomUserDetails();
+        userDetails.setId(user.getId());
+        userDetails.setUserName(user.getUserName());
+        userDetails.setFullName(user.getFullName());
+        userDetails.setPassword(user.getPassword());
         return userDetails;
     }
 
     /**
-     * 查询用户以及角色权限信息
+     * 查询用户以及角色权限信息，用来鉴权
      * @author YIXIUZHENG741
      * @date 2022/1/10 14:31
      * @param userName
@@ -66,9 +84,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     public CustomUserDetails getUserPermByUserName(String userName) {
         List<UserRolePermVo> list = this.baseMapper.getUserPermByUserName(userName, MenuTypeEnum.BTN_TYPE.getCode());
-        if (CollectionUtils.isEmpty(list)) {
-            throw new AccessDeniedException("无权限");
-        }
         CustomUserDetails userDetails = new CustomUserDetails();
         userDetails.setId(list.get(0).getUserId());
         userDetails.setUserName(list.get(0).getUserName());
@@ -76,21 +91,43 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         userDetails.setAuthorities(new HashSet<>());
         Set<PermVo> roleSet = new HashSet<>();
         Set<PermVo> permSet = new HashSet<>();
-        list.stream().forEach(item->{
-            if(StringUtils.isNotEmpty(item.getRoleCode())) {
-                PermVo role = new PermVo();
-                role.setPerm(item.getRoleCode());
-                roleSet.add(role);
-            }
-            if(StringUtils.isNotEmpty(item.getPerm())) {
-                PermVo perm = new PermVo();
-                perm.setPerm(item.getPerm());
-                permSet.add(perm);
-            }
-        });
-        userDetails.getAuthorities().addAll(roleSet);
-        userDetails.getAuthorities().addAll(permSet);
+        if (CollectionUtils.isNotEmpty(list)) {
+            list.stream().forEach(item->{
+                if(StringUtils.isNotEmpty(item.getRoleCode())) {
+                    PermVo role = new PermVo();
+                    role.setPerms(item.getRoleCode());
+                    roleSet.add(role);
+                }
+                if(StringUtils.isNotEmpty(item.getPerms())) {
+                    PermVo perm = new PermVo();
+                    perm.setPerms(item.getPerms());
+                    permSet.add(perm);
+                }
+            });
+            userDetails.getAuthorities().addAll(roleSet);
+            userDetails.getAuthorities().addAll(permSet);
+        }
         return userDetails;
+    }
+
+    /**
+     * 获取当前登录用户信息
+     * @author YIXIUZHENG741
+     * @date 2022/1/10 14:31
+     */
+    public UserVo getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication==null || authentication.getPrincipal()==null) {
+            throw new UsernameNotFoundException("用户不存在");
+        }
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User user = this.getUserByUserName(userDetails.getUserName());
+        UserVo userVo = new UserVo();
+        userVo.setId(user.getId());
+        userVo.setUserName(user.getUserName());
+        userVo.setFullName(user.getFullName());
+        BeanUtils.copyProperties(user, userVo);
+        return userVo;
     }
 
     public Page<User> getPage(UserDto dto) {
@@ -122,16 +159,4 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         baseMapper.deleteById(id);
     }
 
-    public CustomUserDetails getUserPermsFromRedis(String userName) {
-        Object obj = redisOptService.get(SysConstants.USER_PERMS_KEY_PREFIX + userName);
-        CustomUserDetails userDetails = null;
-        if(obj!=null) {
-            userDetails = JSON.parseObject(obj.toString(), CustomUserDetails.class);
-        }
-        return userDetails;
-    }
-
-    public void setUserPermsToRedis(CustomUserDetails userDetails) {
-        redisOptService.set(SysConstants.USER_PERMS_KEY_PREFIX + userDetails.getUsername(), JSON.toJSONString(userDetails), 60*60*6);
-    }
 }

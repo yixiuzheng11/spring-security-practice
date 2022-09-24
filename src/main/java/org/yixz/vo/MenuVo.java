@@ -16,18 +16,24 @@ public class MenuVo {
     private Integer id;
 
     @ApiModelProperty(value = "父id")
-    private Integer pid;
+    private Integer parentId;
 
     @ApiModelProperty(value = "菜单名称")
-    private String name;
+    private String menuName;
+
+    @ApiModelProperty(value = "菜单编码")
+    private String menuCode;
+
+    @ApiModelProperty(value = "菜单图标")
+    private String icon;
 
     @ApiModelProperty(value = "菜单路径")
     private String url;
 
     @ApiModelProperty(value = "授权")
-    private String perm;
+    private String perms;
 
-    @ApiModelProperty(value = "菜单类型，1-目录，2-菜单，3-按钮")
+    @ApiModelProperty(value = "菜单类型，0-目录，1-菜单，2-按钮")
     private Integer type;
 
     @ApiModelProperty(value = "排序")

@@ -17,10 +17,13 @@ public class MenuDto extends BaseDto{
     private Integer id;
 
     @ApiModelProperty(value = "菜单名称")
-    private String name;
+    private String menuName;
+
+    @ApiModelProperty(value = "菜单编码")
+    private String menuCode;
 
     @ApiModelProperty(value = "父id")
-    private Integer pid;
+    private Integer parentId;
 
     @ApiModelProperty(value = "菜单路径")
     private String url;
@@ -29,6 +32,6 @@ public class MenuDto extends BaseDto{
     private String type;
 
     @ApiModelProperty(value = "授权")
-    private String perm;
+    private String perms;
 
 }

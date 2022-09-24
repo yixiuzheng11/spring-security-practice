@@ -17,7 +17,7 @@ public class SysConstants {
     public static String VERIFY_CODE_PARAM = "verifyCode";
 
     //token在请求header中的名称
-    public static String AUTHORIZATION_HEADER= "Authorization";
+    public static String AUTHORIZATION_HEADER= "token";
 
     //用户权限信息在redis中的key前缀
     public static final String USER_PERMS_KEY_PREFIX = "USER_PERMS_";

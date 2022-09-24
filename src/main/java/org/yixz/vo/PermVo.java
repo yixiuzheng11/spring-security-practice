@@ -14,10 +14,10 @@ public class PermVo implements GrantedAuthority {
     /**
      * 权限标识
      */
-    private String perm;
+    private String perms;
 
     @Override
     public String getAuthority() {
-        return this.perm;
+        return this.perms;
     }
 }

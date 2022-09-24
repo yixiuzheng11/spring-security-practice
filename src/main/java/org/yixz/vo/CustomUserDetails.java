@@ -21,11 +21,11 @@ public class CustomUserDetails extends User implements UserDetails {
 
     @Override
     public String getPassword() {
-        return this.getPassword();
+        return super.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return this.getUserName();
+        return super.getUserName();
     }
 }

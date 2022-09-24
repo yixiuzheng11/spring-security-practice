@@ -1,6 +1,7 @@
 package org.yixz.common.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.MediaType;
 import org.yixz.common.response.ResponseResult;
 import org.yixz.common.util.JwtTokenUtil;
 import org.yixz.common.util.SysConstants;
@@ -10,7 +11,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.Map;
 
 /**
  * 自定义JSON格式登录
@@ -28,6 +32,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             response.setContentType("application/json;charset=utf-8");
             PrintWriter out = response.getWriter();
             ResponseResult ok = ResponseResult.success("登录成功!");
+            ok.setData(token);
             String s = new ObjectMapper().writeValueAsString(ok);
             out.write(s);
             out.flush();
@@ -66,10 +71,41 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
                                                 HttpServletResponse response)  {
-        String rawVerifyCode = request.getParameter(SysConstants.VERIFY_CODE_PARAM);
+        if (!"POST".equals(request.getMethod())) {
+            throw new AuthenticationServiceException(
+                    "Authentication method not supported: " + request.getMethod());
+        }
+        //生成的验证码
         String verifyCode = (String)request.getSession().getAttribute(SysConstants.VERIFY_CODE_PARAM);
+        String rawVerifyCode = null;
+        String username = null;
+        String password = null;
+        if (request.getContentType().equals(MediaType.APPLICATION_JSON_VALUE)) {
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                InputStream is = request.getInputStream();
+                Map<String,String> authenticationBean = mapper.readValue(is, Map.class);
+                rawVerifyCode = authenticationBean.get(SysConstants.VERIFY_CODE_PARAM);
+                username = authenticationBean.get(this.getUsernameParameter());
+                password = authenticationBean.get(this.getPasswordParameter());
+            } catch (IOException e) {
+                throw new AuthenticationServiceException("用户名或密码解析失败");
+            }
+        }else {
+            rawVerifyCode = request.getParameter(SysConstants.VERIFY_CODE_PARAM);
+            username = request.getParameter(this.getUsernameParameter());
+            password = request.getParameter(this.getPasswordParameter());
+        }
         if(StringUtils.isEmpty(rawVerifyCode) || StringUtils.isEmpty(verifyCode) || !rawVerifyCode.equals(verifyCode)) {
             throw new AuthenticationServiceException("验证码错误");
+        }
+        if(StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
+            throw new AuthenticationServiceException("用户名或密码不能为空");
+        }
+        if (request.getContentType().equals(MediaType.APPLICATION_JSON_VALUE)) {
+            UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username, password);
+            setDetails(request, authRequest);
+            return this.getAuthenticationManager().authenticate(authRequest);
         }
         return super.attemptAuthentication(request, response);
     }
